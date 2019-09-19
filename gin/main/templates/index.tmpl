@@ -1,0 +1,20 @@
+<html>
+  {{/* ドット名前でgoから受け取れる */}}
+  <h1>{{.name}}</h1>
+  <table border="1">
+    RS address:{{.rsaddr}}
+     <tr>
+         <th>ID</th>
+         <th>En1 address</th>
+         <th>En2 address</th>
+    {{/* ループ処理 */}}
+    {{range .tunnels}}
+     </tr>
+         <th>{{.Index}}</th>
+         <th>{{.En1}}</th>
+         <th>{{.En2}}</th>
+     </tr>
+     {{end}}
+     {{/* ループ処理終了 */}}
+         
+   </table>
