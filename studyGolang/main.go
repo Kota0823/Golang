@@ -6,6 +6,9 @@ import (
 	"net/http"
 )
 
+
+func htmlHandler0(w http.ResponseWriter, r *http.Request) {
+	
 type Information struct {
 	Index string
 	En1   string
@@ -13,8 +16,6 @@ type Information struct {
 }
 
 var tunnels = make(map[[16]byte]Information) //マップ型変数
-
-func htmlHandler0(w http.ResponseWriter, r *http.Request) {
 	tunnels[[16]byte{0}] = Information{
 		Index: "1",
 		En1:   "192.168.100.1",
