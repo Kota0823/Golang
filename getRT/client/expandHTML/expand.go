@@ -5,16 +5,17 @@ HTMLへの展開
 package expandHTML
 
 import (
+	"log"
 	"net/http"
 
-	"../../RelayTableLibrary"
+	librt "../../RelayTableLibrary"
 	"github.com/gin-gonic/gin"
 )
 
-func ExpandRelaytableToHTML(tunnels map[RelayTableLibrary.ID]RelayTableLibrary.Information) (err error) {
-	gin.SetMode(gin.ReleaseMode)
-
+func ExpandRelaytableToHTML(tunnels chan map[librt.ID]librt.Information) (err error) {
+	//gin.SetMode(gin.ReleaseMode)
 	rsAddress := "192.168.100.5"
+	log.Printf("info: expand HTML... \n")
 
 	/*HTMLファイルへレンダリング*/
 	router := gin.Default()
@@ -27,6 +28,9 @@ func ExpandRelaytableToHTML(tunnels map[RelayTableLibrary.ID]RelayTableLibrary.I
 		})
 	})
 
-	err = router.Run(":8989") //サーバ起動
-	return
+	err = router.Run(":8989") //サーバ起動(エラーが発生しない限り実行されるメソッド)
+	if err != nil {
+		log.Printf("error: %v\n", err)
+		return
+	}
 }

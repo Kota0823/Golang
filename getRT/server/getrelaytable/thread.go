@@ -10,13 +10,13 @@ import (
 	"os"
 	"strconv"
 
-	"../../RelayTableLibrary"
+	librt "../../RelayTableLibrary"
 )
 
-func GetTable(channelTunnels chan map[RelayTableLibrary.ID]RelayTableLibrary.Information, control chan<- bool) {
+func GetTable(channelTunnels chan map[librt.ID]librt.Information, control chan<- bool) {
 	/*ソケット作成*/
-	defer os.Remove(RelayTableLibrary.SocketFilepath)                     //プログラム終了時にファイルを削除する
-	listener, err := net.Listen("unix", RelayTableLibrary.SocketFilepath) //PIDの代わりにファイルパスを指定
+	defer os.Remove(librt.SocketFilepath)                     //プログラム終了時にファイルを削除する
+	listener, err := net.Listen("unix", librt.SocketFilepath) //PIDの代わりにファイルパスを指定
 	log.Printf("info: Socket OK\n")
 
 	conn, _ := listener.Accept() //クライアントと接続
@@ -39,34 +39,19 @@ func GetTable(channelTunnels chan map[RelayTableLibrary.ID]RelayTableLibrary.Inf
 		log.Printf("recive:requestType = %d", typeNumber)
 
 		switch typeNumber {
-		case RelayTableLibrary.RequestRelayTable: //リレーテーブル送信処理
+		case librt.RequestRelayTable: //リレーテーブル送信処理
 			for index, entity := range <-channelTunnels { //チャネルからリレーテーブルを取得
-				conn.Write(index[:]) //配列([16]byte)をスライスに変換し，メッセージを送信
-				log.Printf("send:Index %s", string(index[:]))
-				conn.Read(make([]byte, 3)) //応答(ACK)を受信
-				log.Printf("receive:ACK\n")
-
-				conn.Write([]byte(entity.En1)) //メッセージを送信
-				log.Printf("send:En1 %s", entity.En1)
-				conn.Read(make([]byte, 3)) //応答(ACK)を受信
-				log.Printf("receive:ACK\n")
-
-				conn.Write([]byte(entity.En2)) //メッセージを送信
-				log.Printf("send:En2 %s", entity.En2)
-				conn.Read(make([]byte, 3)) //応答(ACK)を受信
-				log.Printf("receive:ACK\n")
+				librt.SendMessage(conn, index[:])
+				librt.SendMessage(conn, []byte(entity.En1))
+				librt.SendMessage(conn, []byte(entity.En2))
 			}
-			conn.Write([]byte("exit")) //すべて送信し終えた場合"exit"を送信
-			conn.Read(make([]byte, 3)) //応答(ACK)を受信
+			librt.SendMessage(conn, []byte("exit")) //すべて送信し終えた場合"exit"を送信
 
-		case RelayTableLibrary.Exit: //処理終了，main関数を終了させる
+		case librt.Exit: //処理終了，main関数を終了させる
 			control <- true
 			break
 
-		case RelayTableLibrary.Pass:
-		}
-	}
-	//var tunnels = make(map[ID]Information)
-	//tunnels <- channelTunnel
-
+		case librt.Pass:
+		} //switch
+	} //for
 }
