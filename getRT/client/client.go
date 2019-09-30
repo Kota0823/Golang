@@ -35,6 +35,8 @@ func main() {
 	/*リレーテーブルをHTMLに出力するスレッド*/
 	go expandHTML.ExpandRelaytableToHTML(tuunelChan)
 
+	defer conn.Write([]byte{49}) //client.go終了時に終了要求を送信
+
 	/*リレーテーブル受信処理*/
 	for range time.Tick(5 * time.Second) { //リレーテーブル取得周期（秒）
 		/*要求送信*/
@@ -57,7 +59,4 @@ func main() {
 		} //for
 		tuunelChan <- tunnels
 	} //for range time.Tick(sec * time.Second)
-
-	conn.Write([]byte{49}) //終了要求
-
 }

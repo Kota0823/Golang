@@ -11,12 +11,8 @@ func main() {
 	/*ダミーデータ*/
 	var tunnels = make(map[RelayTableLibrary.ID]RelayTableLibrary.Information) //マップ型変数
 
-	/*リレーテーブルをスレッドに送るためのチャネル*/
+	/*リレーテーブルをスレッドに送るためのチャネル（スレッド間通信）*/
 	RTChan := make(chan map[RelayTableLibrary.ID]RelayTableLibrary.Information, 100)
-
-	/*main関数制御用チャネル*/
-	control := make(chan bool, 1)
-	control <- false
 
 	/*ダミーデータ1*/
 	tunnels[[16]byte{49}] = RelayTableLibrary.Information{
@@ -30,7 +26,7 @@ func main() {
 	RTChan <- tunnels //スレッド間通信（スレッドに送るトンネル情報）
 
 	/*並行処理によるリレーテーブルの取得，送信*/
-	go getrelaytable.GetTable(RTChan, control)
+	go getrelaytable.GetTable(RTChan)
 
 	time.Sleep(20 * time.Second)
 
@@ -46,10 +42,4 @@ func main() {
 	}
 	RTChan <- tunnels //スレッド間通信
 
-	for {
-		cheak := <-control
-		if cheak == true {
-			break
-		}
-	}
 }

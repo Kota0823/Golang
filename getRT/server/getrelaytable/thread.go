@@ -13,7 +13,7 @@ import (
 	librt "../../RelayTableLibrary"
 )
 
-func GetTable(channelTunnels chan map[librt.ID]librt.Information, control chan<- bool) {
+func GetTable(channelTunnels chan map[librt.ID]librt.Information) {
 	/*ソケット作成*/
 	defer os.Remove(librt.SocketFilepath)                     //プログラム終了時にファイルを削除する
 	listener, err := net.Listen("unix", librt.SocketFilepath) //PIDの代わりにファイルパスを指定
@@ -28,8 +28,6 @@ func GetTable(channelTunnels chan map[librt.ID]librt.Information, control chan<-
 	log.Printf("info: Socket connected\n")
 
 	buf := make([]byte, 1)
-
-	defer conn.Write([]byte("exit"))
 
 	/*クライアントから命令を受信*/
 	for {
@@ -48,7 +46,6 @@ func GetTable(channelTunnels chan map[librt.ID]librt.Information, control chan<-
 			librt.SendMessage(conn, []byte("exit")) //すべて送信し終えた場合"exit"を送信
 
 		case librt.Exit: //処理終了，main関数を終了させる
-			control <- true
 			break
 
 		case librt.Pass:
