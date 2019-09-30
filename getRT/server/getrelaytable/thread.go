@@ -15,7 +15,7 @@ import (
 
 func GetTable(channelTunnels chan map[librt.ID]librt.Information) {
 	/*ソケット作成*/
-	defer os.Remove(librt.SocketFilepath)                     //プログラム終了時にファイルを削除する
+	os.Remove(librt.SocketFilepath)                           //プログラム終了時にファイルを削除する
 	listener, err := net.Listen("unix", librt.SocketFilepath) //PIDの代わりにファイルパスを指定
 	log.Printf("info: Socket OK\n")
 
@@ -27,25 +27,28 @@ func GetTable(channelTunnels chan map[librt.ID]librt.Information) {
 	}
 	log.Printf("info: Socket connected\n")
 
-	buf := make([]byte, 1)
+	tunnel := <-channelTunnels
 
 	/*クライアントから命令を受信*/
 	for {
-		conn.Read(buf) //ソケットから受信した情報読み込み
-
-		typeNumber, _ := strconv.Atoi(string(buf))
+		typeNumber, _ := strconv.Atoi(string(librt.ResiveMessage(conn))) //ソケットから受信した情報読み込み
 		log.Printf("recive:requestType = %d", typeNumber)
 
 		switch typeNumber {
 		case librt.RequestRelayTable: //リレーテーブル送信処理
-			for index, entity := range <-channelTunnels { //チャネルからリレーテーブルを取得
+			select {
+			case tunnel = <-channelTunnels: //チャネルに情報が入っている場合
+			default: //チャネルに情報が入っていない場合
+				log.Println("info: no value")
+			}
+			for index, entity := range tunnel { //リレーテーブルを取得
 				librt.SendMessage(conn, index[:])
 				librt.SendMessage(conn, []byte(entity.En1))
 				librt.SendMessage(conn, []byte(entity.En2))
 			}
 			librt.SendMessage(conn, []byte("exit")) //すべて送信し終えた場合"exit"を送信
 
-		case librt.Exit: //処理終了，main関数を終了させる
+		case librt.Exit: //処理終了
 			break
 
 		case librt.Pass:

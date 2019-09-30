@@ -23,7 +23,7 @@ func main() {
 		En1: "192.168.100.30",
 		En2: "192.168.100.40",
 	}
-	RTChan <- tunnels //スレッド間通信（スレッドに送るトンネル情報）
+	RTChan <- tunnels //スレッド間通信（スレッドに送るトンネル情報をプッシュ）
 
 	/*並行処理によるリレーテーブルの取得，送信*/
 	go getrelaytable.GetTable(RTChan)
@@ -41,5 +41,9 @@ func main() {
 		En2: "192.168.200.87",
 	}
 	RTChan <- tunnels //スレッド間通信
+
+	for {
+
+	}
 
 }

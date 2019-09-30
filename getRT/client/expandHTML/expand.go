@@ -12,25 +12,35 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func ExpandRelaytableToHTML(tunnels chan map[librt.ID]librt.Information) (err error) {
-	//gin.SetMode(gin.ReleaseMode)
+func ExpandRelaytableToHTML(tunnelchan chan map[librt.ID]librt.Information) (err error) {
+	gin.SetMode(gin.ReleaseMode)
 	rsAddress := "192.168.100.5"
-	log.Printf("info: expand HTML... \n")
+
+	/*リレーテーブル用チャネルから取得*/
+	tunnel := <-tunnelchan
 
 	/*HTMLファイルへレンダリング*/
 	router := gin.Default()
 	router.LoadHTMLGlob("expandHTML/templates/*.tmpl") //テンプレートファイル読み込み
 	router.GET("/relaytable", func(c *gin.Context) {
+		/*リレーテーブル用チャネルに更新がある場合は取得*/
+		select {
+		case tunnel = <-tunnelchan: //チャネルに情報が入っている場合
+		default: //チャネルに情報が入っていない場合
+			log.Println("info: no value")
+		}
 		c.HTML(http.StatusOK, "index.tmpl", gin.H{
 			"name":    "\"github.com/gin-gonic/gin\"",
 			"rsaddr":  rsAddress,
-			"tunnels": tunnels,
+			"tunnels": tunnel,
 		})
 	})
 
+	log.Printf("info: expand HTML... \n")
 	err = router.Run(":8989") //サーバ起動(エラーが発生しない限り実行されるメソッド)
 	if err != nil {
-		log.Printf("error: %v\n", err)
+		log.Printf("gin error: %v\n", err)
 		return
 	}
+	return
 }

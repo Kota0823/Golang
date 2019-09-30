@@ -46,21 +46,21 @@ func SendMessage(conn net.Conn, message []byte) (err error) {
 	return
 }
 
-func ResiveMessage(conn net.Conn) (message string) {
-	buf := make([]byte, 20)
-	_, err := conn.Read(buf) //配列([16]byte)をスライスに変換し，メッセージを送信
+func ResiveMessage(conn net.Conn) (message []byte) {
+	buf := make([]byte, 16)
+	_, err := conn.Read(buf)
 	if err != nil {
 		log.Printf("error: %v\n", err) //ソケット作成時エラーが発生した場合
-		return ""
+		return
 	}
 	log.Printf("receive: %s", string(buf))
 
 	_, err = conn.Write([]byte("ACK")) //応答
 	if err != nil {
 		log.Printf("error: %v\n", err) //ソケット作成時エラーが発生した場合
-		return ""
+		return
 	}
 	log.Printf("send: ACK\n")
 
-	return string(buf)
+	return buf
 }
