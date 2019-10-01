@@ -40,14 +40,14 @@ func main() {
 
 	/*リレーテーブル受信処理*/
 	for range time.Tick(5 * time.Second) { //リレーテーブル取得周期（秒）
-		log.Printf("info: Get Relaytable...")
+		log.Printf("info: Get Relaytable...\n")
 
 		/*要求送信*/
 		librt.SendMessage(conn, []byte{48})
 		for {
 			index := librt.ResiveMessage(conn)
 			if reflect.DeepEqual(index[0:4], librt.EXIT) == true {
-				log.Printf("info: finish for loop")
+				log.Printf("info: finish for loop\n")
 				break //exitの文字列を受信した場合forループ終了（リレーテーブルを全て受信した）
 			}
 

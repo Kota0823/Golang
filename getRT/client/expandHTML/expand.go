@@ -7,6 +7,7 @@ package expandHTML
 import (
 	"log"
 	"net/http"
+	"time"
 
 	librt "../../RelayTableLibrary"
 	"github.com/gin-gonic/gin"
@@ -19,6 +20,8 @@ func ExpandRelaytableToHTML(tunnelchan chan map[librt.ID]librt.Information) (err
 	/*リレーテーブル用チャネルから取得*/
 	tunnel := <-tunnelchan
 
+	updateTableTimeChan := time.Now()
+
 	/*HTMLファイルへレンダリング*/
 	router := gin.Default()
 	router.LoadHTMLGlob("expandHTML/templates/*.tmpl") //テンプレートファイル読み込み
@@ -26,11 +29,12 @@ func ExpandRelaytableToHTML(tunnelchan chan map[librt.ID]librt.Information) (err
 		/*リレーテーブル用チャネルに更新がある場合は取得*/
 		select {
 		case tunnel = <-tunnelchan: //チャネルに情報が入っている場合
+			updateTableTimeChan = time.Now() //リレーテーブル取得時間を格納
 		default: //チャネルに情報が入っていない場合
 			log.Println("info: no value")
 		}
 		c.HTML(http.StatusOK, "index.tmpl", gin.H{
-			"name":    "\"github.com/gin-gonic/gin\"",
+			"time":    updateTableTimeChan,
 			"rsaddr":  rsAddress,
 			"tunnels": tunnel,
 		})

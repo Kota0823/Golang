@@ -28,7 +28,7 @@ func main() {
 	/*並行処理によるリレーテーブルの取得，送信*/
 	go getrelaytable.GetTable(RTChan)
 
-	time.Sleep(20 * time.Second)
+	time.Sleep(30 * time.Second)
 
 	/*ダミーデータ2*/
 	tunnels[[16]byte{51}] = RelayTableLibrary.Information{
