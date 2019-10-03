@@ -9,7 +9,6 @@ import (
 	"net"
 	"os"
 	"strconv"
-	"sync"
 
 	librt "../RelayTableLibrary"
 )
@@ -17,9 +16,6 @@ import (
 func GetTable() {
 	/*リレーテーブル（ダンプ後）*/
 	var dumpedTunnels = make(map[ID]Information) //マップ型変数
-
-	/*相互排他制御用変数*/
-	mutex := new(sync.RWMutex)
 
 	/*ソケット作成*/
 	os.Remove(librt.SocketFilepath)                           //プログラム終了時にファイルを削除する

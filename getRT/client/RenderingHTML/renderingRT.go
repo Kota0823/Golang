@@ -26,11 +26,11 @@ func ExpandRelaytableToHTML(tunnelchan chan map[librt.ID]librt.Information) (err
 	router := gin.Default()
 	router.LoadHTMLGlob("expandHTML/templates/*.tmpl") //テンプレートファイル読み込み
 	router.GET("/relaytable", func(c *gin.Context) {
-		/*リレーテーブル用チャネルに更新がある場合は取得*/
+		/*リレーテーブル用キューに情報がある場合は取得*/
 		select {
-		case tunnel = <-tunnelchan: //チャネルに情報が入っている場合
+		case tunnel = <-tunnelchan: //キューに情報が入っている場合
 			updateTableTimeChan = time.Now() //リレーテーブル取得時間を格納
-		default: //チャネルに情報が入っていない場合
+		default: //キューに情報が入っていない場合
 			log.Println("info: no value")
 		}
 		c.HTML(http.StatusOK, "index.tmpl", gin.H{

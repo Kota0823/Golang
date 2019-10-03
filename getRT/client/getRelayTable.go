@@ -7,8 +7,8 @@ package main
 import (
 	"log"
 	"net"
-	"os" //スライス比較
-	"reflect"
+	"os"
+	"reflect" //スライス比較
 	"strings"
 	"time"
 
@@ -59,6 +59,6 @@ func main() {
 				En2:   strings.Trim(string(librt.ResiveMessage(conn)), string([]byte{0})),
 			}
 		} //for
-		tuunelChan <- tunnels
+		tuunelChan <- tunnels //キューに追加
 	} //for range time.Tick(sec * time.Second)
 }

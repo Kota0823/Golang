@@ -16,10 +16,10 @@ type Information struct {
 /*リレーテーブル(グローバル変数)*/
 var tunnels = make(map[ID]Information) //マップ型変数
 
-func main() {
-	/*相互排他制御用変数*/
-	mutex := new(sync.RWMutex)
+/*相互排他制御用変数(スレッド下でも使用するためグローバルで定義)*/
+var mutex = new(sync.RWMutex)
 
+func main() {
 	/*ダミーデータ1*/
 	mutex.Lock() //書き込みロック
 	tunnels[[16]byte{49}] = Information{
@@ -52,5 +52,4 @@ func main() {
 	for {
 		//main関数が死なないように無限ループ
 	}
-
 }
