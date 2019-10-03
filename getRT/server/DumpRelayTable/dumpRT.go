@@ -13,7 +13,19 @@ import (
 	librt "../../RelayTableLibrary"
 )
 
-func GetTable(channelTunnels chan map[librt.ID]librt.Information) {
+/*リレーテーブル(グローバル変数)*/
+type ID [16]byte //マップ型変数で使用するキー
+
+type Information struct {
+	Index string
+	En1   string
+	En2   string
+}
+
+/*ダミーデータ*/
+var tunnels = make(map[ID]Information) //マップ型変数
+
+func GetTable(channelTunnels chan map[ID]Information) {
 	/*ソケット作成*/
 	os.Remove(librt.SocketFilepath)                           //プログラム終了時にファイルを削除する
 	listener, err := net.Listen("unix", librt.SocketFilepath) //PIDの代わりにファイルパスを指定
