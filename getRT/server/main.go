@@ -1,3 +1,9 @@
+/*
+RSが行う処理が記述されたプログラム（テスト用）
+これを実行する
+go build main.go dumpRT.go
+*/
+
 package main
 
 import (
@@ -33,7 +39,7 @@ func main() {
 	mutex.Unlock() //書き込みアンロック
 
 	/*並行処理によるリレーテーブルの取得，送信*/
-	go GetTable()
+	go GetRelayTable()
 
 	time.Sleep(30 * time.Second)
 

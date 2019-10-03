@@ -13,7 +13,7 @@ import (
 	librt "../RelayTableLibrary"
 )
 
-func GetTable() {
+func GetRelayTable() {
 	/*リレーテーブル（ダンプ後）*/
 	var dumpedTunnels = make(map[ID]Information) //マップ型変数
 
@@ -48,6 +48,7 @@ func GetTable() {
 				librt.SendMessage(conn, []byte(entity.En2))
 			}
 			librt.SendMessage(conn, []byte("exit")) //すべて送信し終えた場合"exit"を送信
+			typeNumber = librt.Pass
 
 		case librt.Exit: //処理終了
 			break

@@ -24,8 +24,9 @@ func ExpandRelaytableToHTML(tunnelchan chan map[librt.ID]librt.Information) (err
 
 	/*HTMLファイルへレンダリング*/
 	router := gin.Default()
-	router.LoadHTMLGlob("expandHTML/templates/*.tmpl") //テンプレートファイル読み込み
+	router.LoadHTMLGlob("renderingHTML/templates/*.tmpl") //テンプレートファイル読み込み
 	router.GET("/relaytable", func(c *gin.Context) {
+		log.Printf("info: Rendering HTML... \n")
 		/*リレーテーブル用キューに情報がある場合は取得*/
 		select {
 		case tunnel = <-tunnelchan: //キューに情報が入っている場合
@@ -40,7 +41,6 @@ func ExpandRelaytableToHTML(tunnelchan chan map[librt.ID]librt.Information) (err
 		})
 	})
 
-	log.Printf("info: expand HTML... \n")
 	err = router.Run(":8989") //サーバ起動(エラーが発生しない限り実行されるメソッド)
 	if err != nil {
 		log.Printf("gin error: %v\n", err)

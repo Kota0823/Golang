@@ -1,5 +1,6 @@
 /*
 管理プロセス（リレーテーブルの取得，HTMLへの展開）
+これを実行する
 */
 
 package main
@@ -30,7 +31,7 @@ func main() {
 	/*受信した情報を格納するマップ型変数の定義*/
 	var tunnels = make(map[librt.ID]librt.Information) //マップ型変数
 
-	/*リレーテーブル用チャネル*/
+	/*リレーテーブル用チャネル(キュー)*/
 	tuunelChan := make(chan map[librt.ID]librt.Information)
 
 	/*リレーテーブルをHTMLに出力するスレッド*/
