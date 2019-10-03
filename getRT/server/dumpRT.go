@@ -2,30 +2,25 @@
 リレーテーブルの情報を取得するスレッド
 */
 
-package DumpRelayTable
+package main
 
 import (
 	"log"
 	"net"
 	"os"
 	"strconv"
+	"sync"
 
-	librt "../../RelayTableLibrary"
+	librt "../RelayTableLibrary"
 )
 
-/*リレーテーブル(グローバル変数)*/
-type ID [16]byte //マップ型変数で使用するキー
+func GetTable() {
+	/*リレーテーブル（ダンプ後）*/
+	var dumpedTunnels = make(map[ID]Information) //マップ型変数
 
-type Information struct {
-	Index string
-	En1   string
-	En2   string
-}
+	/*相互排他制御用変数*/
+	mutex := new(sync.RWMutex)
 
-/*ダミーデータ*/
-var tunnels = make(map[ID]Information) //マップ型変数
-
-func GetTable(channelTunnels chan map[ID]Information) {
 	/*ソケット作成*/
 	os.Remove(librt.SocketFilepath)                           //プログラム終了時にファイルを削除する
 	listener, err := net.Listen("unix", librt.SocketFilepath) //PIDの代わりにファイルパスを指定
@@ -39,8 +34,6 @@ func GetTable(channelTunnels chan map[ID]Information) {
 	}
 	log.Printf("info: Socket connected\n")
 
-	tunnel := <-channelTunnels
-
 	/*クライアントから命令を受信*/
 	for {
 		typeNumber, _ := strconv.Atoi(string(librt.ResiveMessage(conn))) //ソケットから受信した情報読み込み
@@ -48,12 +41,12 @@ func GetTable(channelTunnels chan map[ID]Information) {
 
 		switch typeNumber {
 		case librt.RequestRelayTable: //リレーテーブル送信処理
-			select {
-			case tunnel = <-channelTunnels: //チャネルに情報が入っている場合
-			default: //チャネルに情報が入っていない場合
-				log.Println("info: no value")
-			}
-			for index, entity := range tunnel { //リレーテーブルを取得
+			/*mainよりリレーテーブルの取得*/
+			mutex.RLock() //読み込みロック（ロック取れるまでブロック）
+			dumpedTunnels = tunnels
+			mutex.RUnlock() //読み込みアンロック
+
+			for index, entity := range dumpedTunnels { //リレーテーブルを取得
 				librt.SendMessage(conn, index[:])
 				librt.SendMessage(conn, []byte(entity.En1))
 				librt.SendMessage(conn, []byte(entity.En2))
