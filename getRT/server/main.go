@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"../RelayTableLibrary"
-	"./getrelaytable"
+	"./DumpRelayTable"
 )
 
 func main() {
@@ -26,7 +26,7 @@ func main() {
 	RTChan <- tunnels //スレッド間通信（スレッドに送るトンネル情報をプッシュ）
 
 	/*並行処理によるリレーテーブルの取得，送信*/
-	go getrelaytable.GetTable(RTChan)
+	go DumpRelayTable.GetTable(RTChan)
 
 	time.Sleep(30 * time.Second)
 

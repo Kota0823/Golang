@@ -2,7 +2,7 @@
 HTMLへの展開
 */
 
-package expandHTML
+package RenderingHTML
 
 import (
 	"log"

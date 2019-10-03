@@ -13,7 +13,7 @@ import (
 	"time"
 
 	librt "../RelayTableLibrary"
-	"./expandHTML"
+	"./RenderingHTML"
 )
 
 func main() {
@@ -34,7 +34,7 @@ func main() {
 	tuunelChan := make(chan map[librt.ID]librt.Information)
 
 	/*リレーテーブルをHTMLに出力するスレッド*/
-	go expandHTML.ExpandRelaytableToHTML(tuunelChan)
+	go RenderingHTML.ExpandRelaytableToHTML(tuunelChan)
 
 	defer conn.Write([]byte{49}) //client.go終了時に終了要求を送信
 

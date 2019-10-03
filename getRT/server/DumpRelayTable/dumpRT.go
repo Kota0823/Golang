@@ -2,7 +2,7 @@
 リレーテーブルの情報を取得するスレッド
 */
 
-package getrelaytable
+package DumpRelayTable
 
 import (
 	"log"
