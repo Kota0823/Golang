@@ -18,9 +18,9 @@ import (
 )
 
 /*リレーテーブルのキューをクリア*/
-func CrearChans(targetChan chan map[librt.ID]librt.Information) {
-	rt := <-targetChan
-	return
+func CrearChans(targetChan chan map[librt.ID]librt.Information) bool {
+	_, ok := <-targetChan
+	return ok
 }
 
 func main() {

@@ -41,7 +41,7 @@ func main() {
 	/*並行処理によるリレーテーブルの取得，送信*/
 	go GetRelayTable()
 
-	time.Sleep(30 * time.Second)
+	time.Sleep(150 * time.Second)
 
 	/*ダミーデータ2*/
 	mutex.Lock() //書き込みロック
