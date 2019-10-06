@@ -17,6 +17,12 @@ import (
 	"./RenderingHTML"
 )
 
+/*リレーテーブルのキューをクリア*/
+func CrearChans(targetChan chan map[librt.ID]librt.Information) {
+	rt := <-targetChan
+	return
+}
+
 func main() {
 	/*ソケット作成*/
 	defer os.Remove(librt.SocketFilepath)               //プログラム終了時にファイルを削除する
@@ -31,10 +37,10 @@ func main() {
 	/*受信した情報を格納するマップ型変数の定義*/
 	var tunnels = make(map[librt.ID]librt.Information) //マップ型変数
 
-	/*リレーテーブル用チャネル(キュー)*/
-	tuunelChan := make(chan map[librt.ID]librt.Information)
+	/*リレーテーブル用チャネル(キュー),バッファ1*/
+	tuunelChan := make(chan map[librt.ID]librt.Information, 1)
 
-	/*リレーテーブルをHTMLに出力するスレッド*/
+	/*リレーテーブルをHTMLに出力するスレッド実行*/
 	go RenderingHTML.ExpandRelaytableToHTML(tuunelChan)
 
 	defer conn.Write([]byte{49}) //client.go終了時に終了要求を送信
@@ -60,6 +66,11 @@ func main() {
 				En2:   strings.Trim(string(librt.ResiveMessage(conn)), string([]byte{0})),
 			}
 		} //for
-		tuunelChan <- tunnels //キューに追加
+		select {
+		case tuunelChan <- tunnels: //キューに追加
+		default:
+			go CrearChans(tuunelChan)
+			tuunelChan <- tunnels //クリアして書き込めるまでブロック
+		} //select
 	} //for range time.Tick(sec * time.Second)
 }
